@@ -36,7 +36,6 @@ const App = () => {
   });
 
   const [message, setMessage] = useState('byAkrep');
-  const [dialogHeader, setDialogHeader] = useState("1 ile 100 arasında bir sayı tuttum bil bakalım.");
   const [showModal, setShowModal] = useState(false);
   const [isNewGame, setIsNewGame] = useState(() => {
     const storedGuesses = JSON.parse(localStorage.getItem('guesses'));
@@ -59,21 +58,21 @@ const App = () => {
   const handleGuess = () => {
     const parsedGuess = parseInt(guess, 10);
     if (isNaN(parsedGuess)) {
-      setDialogHeader('Lütfen bir sayı girin.');
+      setMessage('Lütfen bir sayı girin.');
     } else {
       const updatedGuesses = [...guesses, parsedGuess];
       setGuesses(updatedGuesses);
       if (parsedGuess === numberToGuess) {
-        setDialogHeader('Tebrikler! Doğru tahmin ettiniz.');
+        setMessage('Tebrikler! Doğru tahmin ettiniz.');
         setGuess('');
         if (!isNewGame) {
           setShowModal(true);
         }
       } else if (parsedGuess < numberToGuess) {
-        setDialogHeader('Daha büyük bir sayı deneyin.');
+        setMessage('Daha büyük bir sayı deneyin.');
         setGuess('');
       } else {
-        setDialogHeader('Daha küçük bir sayı deneyin.');
+        setMessage('Daha küçük bir sayı deneyin.');
         setGuess('');
       }
     }
@@ -83,7 +82,7 @@ const App = () => {
     setNumberToGuess(generateRandomNumber());
     setGuess('');
     setGuesses([]);
-    setMessage('byAkrep');
+    setMessage('');
     setShowModal(false);
     setIsNewGame(false);
   };
@@ -100,7 +99,7 @@ const App = () => {
         <Button label="Oyunu Aç" onClick={handleShowModal} />
       )}
       <Message severity="info" text={message} />
-      <Dialog header={dialogHeader} visible={showModal} onHide={() => setShowModal(false)}>
+      <Dialog header="Sayı Tahmin Oyunu" visible={showModal} onHide={() => setShowModal(false)}>
         <div className="modal-content">
           <InputText type="text" value={guess} onChange={(e) => setGuess(e.target.value)} />
           <Button label="Tahmin Et" onClick={handleGuess} />

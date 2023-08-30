@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import CryptoJS from 'crypto-js';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { Message } from 'primereact/message';
-import { ScrollPanel } from 'primereact/scrollpanel';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import './App.css';
 
 const secretKey = 'your-secret-key';
 
@@ -21,7 +12,7 @@ const decryptData = (encryptedData) => {
   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 };
 
-const App = () => {
+const Game = () => {
   const generateRandomNumber = () => Math.floor(Math.random() * 100) + 1;
 
   const [numberToGuess, setNumberToGuess] = useState(() => {
@@ -35,8 +26,7 @@ const App = () => {
     return storedGuesses || [];
   });
 
-  const [message, setMessage] = useState('byAkrep');
-  const [dialogHeader, setDialogHeader] = useState("1 ile 100 arasında bir sayı tuttum bil bakalım.");
+  const [message, setMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [isNewGame, setIsNewGame] = useState(() => {
     const storedGuesses = JSON.parse(localStorage.getItem('guesses'));
@@ -59,21 +49,21 @@ const App = () => {
   const handleGuess = () => {
     const parsedGuess = parseInt(guess, 10);
     if (isNaN(parsedGuess)) {
-      setDialogHeader('Lütfen bir sayı girin.');
+      setMessage('Lütfen bir sayı girin.');
     } else {
       const updatedGuesses = [...guesses, parsedGuess];
       setGuesses(updatedGuesses);
       if (parsedGuess === numberToGuess) {
-        setDialogHeader('Tebrikler! Doğru tahmin ettiniz.');
+        setMessage('Tebrikler! Doğru tahmin ettiniz.');
         setGuess('');
         if (!isNewGame) {
           setShowModal(true);
         }
       } else if (parsedGuess < numberToGuess) {
-        setDialogHeader('Daha büyük bir sayı deneyin.');
+        setMessage('Daha büyük bir sayı deneyin.');
         setGuess('');
       } else {
-        setDialogHeader('Daha küçük bir sayı deneyin.');
+        setMessage('Daha küçük bir sayı deneyin.');
         setGuess('');
       }
     }
@@ -83,39 +73,41 @@ const App = () => {
     setNumberToGuess(generateRandomNumber());
     setGuess('');
     setGuesses([]);
-    setMessage('byAkrep');
+    setMessage('');
     setShowModal(false);
     setIsNewGame(false);
   };
 
   return (
-    <div className="app">
+    <div>
       <h1>Sayı Tahmin Oyunu</h1>
       {isNewGame ? (
         <>
-          <Message severity="warn" text="Dikkat! 'Yeni Oyun Başlat' butonuna basmadığınız sürece eski oyuna devam edersiniz. (Doğru cevabı bulsanız bile 😉)" />
-          <Button label="Yeni Oyun Başlat" onClick={handleNewGame} />
+          <p>Dikkat! "Yeni Oyun Başlat" butonuna basmadığınız sürece eski oyuna devam edersiniz.(Doğru cevabı bulsanız bile 😉)</p>
+          <button onClick={handleNewGame}>Yeni Oyun Başlat</button>
         </>
       ) : (
-        <Button label="Oyunu Aç" onClick={handleShowModal} />
+        <button onClick={handleShowModal}>Oyunu Aç</button>
       )}
-      <Message severity="info" text={message} />
-      <Dialog header={dialogHeader} visible={showModal} onHide={() => setShowModal(false)}>
-        <div className="modal-content">
-          <InputText type="text" value={guess} onChange={(e) => setGuess(e.target.value)} />
-          <Button label="Tahmin Et" onClick={handleGuess} />
+      <p>{message}</p>
+      {showModal && (
+        <div className="modal">
+          <input
+            type="text"
+            value={guess}
+            onChange={(e) => setGuess(e.target.value)}
+          />
+          <button onClick={handleGuess}>Tahmin Et</button>
           <h2>Tahminleriniz:</h2>
-          <ScrollPanel style={{ height: '200px' }}>
-            <ul>
-              {guesses.map((guess, index) => (
-                <li key={index}>{guess}</li>
-              ))}
-            </ul>
-          </ScrollPanel>
+          <ul>
+            {guesses.map((guess, index) => (
+              <li key={index}>{guess}</li>
+            ))}
+          </ul>
         </div>
-      </Dialog>
+      )}
     </div>
   );
 };
 
-export default App;
+export default Game;
